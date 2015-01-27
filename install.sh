@@ -4,9 +4,9 @@
 #
 # opentsdb must be installed, either using .rpm or "make install" after building it
 
-HADOOP_HOME=/opt/mapr/hadoop/hadoop-0.20.2
-HBASE_HOME=/opt/mapr/hbase/hbase-0.94.21
-OPENTSDB_HOME=/usr/local/share/opentsdb
+HADOOP_HOME=${HADOOP_HOME:=/opt/mapr/hadoop/hadoop-0.20.2}
+HBASE_HOME=${HBASE_HOME:=/opt/mapr/hbase/hbase-0.94.21}
+OPENTSDB_HOME=${OPENTSDB_HOME:=/usr/share/opentsdb}
 
 #******************************************
 # first check if required folders are available
@@ -39,7 +39,7 @@ test -d "$OPENTSDB_HOME" || {
 
 #******************************************
 # download 'asynchbase-*-mapr.jar' into OPENTSDB_HOME
-read -p "Press [Enter] to download asynchbase..."
+#read -p "Press [Enter] to download asynchbase..."
 
 if [[ `cat /opt/mapr/MapRBuildVersion` == 4* ]] ;
 then
