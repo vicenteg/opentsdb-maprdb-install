@@ -7,6 +7,7 @@
 HADOOP_HOME=${HADOOP_HOME:=/opt/mapr/hadoop/hadoop-0.20.2}
 HBASE_HOME=${HBASE_HOME:=/opt/mapr/hbase/hbase-0.94.21}
 OPENTSDB_HOME=${OPENTSDB_HOME:=/usr/share/opentsdb}
+ASYNCHBASE_HOME=${ASYNCHBASE_HOME:=/opt/mapr/asynchbase/asynchbase-1.5.0}
 
 #******************************************
 # first check if required folders are available
@@ -18,6 +19,10 @@ test -d "$HADOOP_HOME" || {
 }
 test -d "$HBASE_HOME" || {
   echo >&2 "'$HBASE_HOME' doesn't exist, is mapr-hbase installed ?"
+  exit 1
+}
+test -d "$ASYNCHBASE_HOME" || {
+  echo >&2 "'$ASYNCHBASE_HOME' doesn't exist, is mapr-asynchbase installed?"
   exit 1
 }
 test -d "$OPENTSDB_HOME" || {
@@ -37,20 +42,7 @@ test -d "$OPENTSDB_HOME" || {
   cp "$jar" "$OPENTSDB_HOME/lib/"
   done
 
-#******************************************
-# download 'asynchbase-*-mapr.jar' into OPENTSDB_HOME
-#read -p "Press [Enter] to download asynchbase..."
-
-if [[ `cat /opt/mapr/MapRBuildVersion` == 4* ]] ;
-then
-  echo "MapR 4.x installed. Downloading asynchbase 1.5.0"
-  async_link=http://repository.mapr.com/nexus/content/groups/mapr-public/org/hbase/asynchbase/1.5.0-mapr-1408/asynchbase-1.5.0-mapr-1408.jar
-else
-  echo "MapR 3.x installed. Downloading asynchbase 1.4.1"
-  async_link=http://repository.mapr.com/nexus/content/groups/mapr-public/org/hbase/asynchbase/1.4.1-mapr-1407/asynchbase-1.4.1-mapr-1407.jar
-fi
-
-async_file=`basename "$async_link"`
+async_file=`basename "$ASYNCHBASE_HOME/asynchbase-1.5.0-mapr-1501.jar"`
 
 # but first check if it isn't already downloaded
 test -f "$OPENTSDB_HOME/lib/$async_file" && {
@@ -58,14 +50,10 @@ test -f "$OPENTSDB_HOME/lib/$async_file" && {
   exit 0
 }
 
-wget $async_link -O "./$async_file-t"
-
-#TODO we should probably checksum the file to make sure it downloaded correctly
-
 # we need to replace the existing asynchbase jar by the one we will download from mapr
 if ls $OPENTSDB_HOME/lib/asynchbase* &> /dev/null; then
-  old_async=$(ls $OPENTSDB_HOME/lib/asynchbase*)
+  old_async=$(ls $OPENTSDB_HOME/lib/asynchbase*jar)
   mv $old_async "$old_async-old"
 fi
 
-mv "./$async_file-t" "$OPENTSDB_HOME/lib/$async_file"
+cp "$ASYNCHBASE_HOME/$async_file" "$OPENTSDB_HOME/lib/$async_file"
